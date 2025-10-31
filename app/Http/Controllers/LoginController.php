@@ -1,24 +1,39 @@
 <?php
 
 namespace App\Http\Controllers;
-use RealRashid\SweetAlert\Facades\Alert;
+
 use Illuminate\Http\Request;
+use Alert;
 use Illuminate\Support\Facades\Auth;
+
+
 
 class LoginController extends Controller
 {
+    //
     public function index()
     {
         return view('login');
     }
-    public function actionLogin(Request $request){
-        $credentials = $request->only('email,password');
-        if (Auth::attempt($credentials)){
+
+    public function actionLogin(Request $request)
+    {
+
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->intended('dashboard');
         }
-       //klao login tidak berhasil pake alert
-       Alert::warning('YAHH!', 'Invalid credentials');
-       return back()->withInput($request->only('email'));
+
+        // jika login tidak berhasil
+
+        alert()->warning('Upps', 'Invalid Credentials');
+
+        return back()->withInput($request->only('email'));
+    }
+    public function logout()
+    {
+        Auth::logout();
+        return redirect()->to('/');
     }
 }

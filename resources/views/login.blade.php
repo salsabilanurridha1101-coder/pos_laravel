@@ -40,6 +40,7 @@
 
 <body>
 @include('sweetalert::alert')
+
   <main>
     <div class="container">
 
@@ -65,12 +66,12 @@
                   </div>
 
                   <form class="row g-3 needs-validation" novalidate method="post" action="{{ route('action-login') }}">
-
+                    @csrf
                     <div class="col-12">
                       <label for="yourUsername" class="form-label">Email</label>
                       <div class="input-group has-validation">
                         <span class="input-group-text" id="inputGroupPrepend">@</span>
-                        <input type="email" name="email" class="form-control" id="yourUsername" required>
+                        <input type="email" name="email" class="form-control" id="yourUsername" required value="{{ old('email') }}">
                         <div class="invalid-feedback">Please enter your email.</div>
                       </div>
                     </div>
