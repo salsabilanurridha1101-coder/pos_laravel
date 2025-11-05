@@ -14,4 +14,9 @@ class Product extends Model
             'product_description',
             'is_active',
     ];
+    //ingin membuat relasi want to many : belongsTo
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id', 'id');
+    } 
 }

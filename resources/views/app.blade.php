@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Components / Accordion - NiceAdmin Bootstrap Template</title>
+    <title>{{ $title ?? '' }}</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -52,25 +52,19 @@
     <main id="main" class="main">
 
         <div class="pagetitle">
-            <h1>Blank Page</h1>
-            <nav>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                    <li class="breadcrumb-item">Pages</li>
-                    <li class="breadcrumb-item active">Blank</li>
-                </ol>
-            </nav>
+            <h1>{{ $title ?? '' }}</h1>
         </div><!-- End Page Title -->
 
         <section class="section">
             <div class="row">
-                <div class="col-lg-10">
+                <div class="col-lg-12">
 
                     <div class="card">
                         <div class="card-body">
-                            {{--  <h5 class="card-title">Example Card</h5>
-                            <p>This is an examle page with no contrnt. You can use it as a starter for your custom
+                            <h5 class="card-title">{{ $title ?? '' }}</h5>
+                            {{--  <p>This is an examle page with no contrnt. You can use it as a starter for your custom
                                 pages.</p>  --}}
+                                @include('sweetalert::alert')
                                 @yield('content')
                         </div>
                     </div>

@@ -1,24 +1,23 @@
 @extends('app')
 @section('content')
+@section('title', 'Data Categories')
     {{--  @dd($users)  --}}
     <div class="d-flex justify-content-end my-2">
-        <a href="{{ route('user.create') }}" class="btn btn-primary">Add</a>
+        <a href="{{ route('category.create') }}" class="btn btn-primary">Add Category</a>
     </div>
     <table class="table table-bordered">
         <tr>
-            <th>No.</th>
-            <th>Username</th>
-            <th>Email</th>
+            <th>No</th>
+            <th>Name</th>
             <th>Actions</th>
         </tr>
-        @foreach ($users as $i => $user)
+        @foreach ($datas as $i => $data)
             <tr>
                 <td>{{ $i + 1 }}</td>
-                <td>{{ $user->name }}</td>
-                <td>{{ $user->email }}</td>
+                <td>{{ $data->category_name }}</td>
                 <td>
-                    <a href="{{ route('user.edit', $user->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                    <form action="{{ route('user.destroy', $user->id) }}" method="post"
+                    <a href="{{ route('category.edit', $data->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <form action="{{ route('category.destroy', $data->id) }}" method="post"
                         onsubmit="return confirm('R u sure wanna delete it')" class="d-inline">
                         @csrf
                         @method('DELETE')

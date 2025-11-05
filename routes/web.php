@@ -18,7 +18,13 @@ Route::middleware(['auth'])->group(function(){
     // Route::get('user/edit/{id}', [\App\Http\Controllers\UserController::class, 'edit'])->name('user.edit');
     // Route::put('user/update/{id}', [\App\Http\Controllers\UserController::class, 'update'])->name('user.update');
     // Route::delete('user/destroy/{id}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('user.destroy');
+    Route::resource('role', \App\Http\Controllers\RoleController::class);
     Route::resource('user', \App\Http\Controllers\UserController::class);
+    Route::resource('category', \App\Http\Controllers\CategoriesController::class);
+    Route::resource('product', \App\Http\Controllers\ProductController::class);
+    Route::resource('profile', \App\Http\Controllers\ProfileController::class);
+    Route::post('change-password', [\App\Http\Controllers\ProfileController::class, 'changePassword'])->name('profile.change-password');
+
 
 
 });
