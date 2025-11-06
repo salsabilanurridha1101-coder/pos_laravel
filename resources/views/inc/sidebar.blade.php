@@ -16,7 +16,7 @@
             </a>
             <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                 <li>
-                    <a href="forms-elements.html">
+                    <a href="{{route('order.index')}}">
                         <i class="bi bi-circle"></i><span>View All</span>
                     </a>
                 </li>
@@ -61,7 +61,7 @@
         <li class="nav-heading">Pages</li>
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="users-profile.html">
+            <a class="nav-link collapsed" href="{{ route('profile.index') }}">
                 <i class="bi bi-person"></i>
                 <span>Profile</span>
             </a>

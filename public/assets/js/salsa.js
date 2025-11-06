@@ -88,6 +88,7 @@ buttons.forEach((btn) => {
 //"id" hanya 1,"classs" sifatnya banyak
 
 let currentCategory = "all";
+let products = [];
 
 function filterCategory(category, event) {
     currentCategory = category;
@@ -96,7 +97,7 @@ function filterCategory(category, event) {
     buttons.forEach((btn) => {
     btn.classList.remove('active');
     btn.classList.remove('btn-warning');
-    btn.classList.add("btn-outline-warning") ;   
+    btn.classList.add("btn-outline-warning") ;
 });
 event.classList.add("active");
 event.classList.remove("btn-outline-warning");
@@ -107,9 +108,12 @@ console.log({currentCategory: currentCategory, category: category, event: event}
 renderProducts();
 }
 
-function renderProducts(searchProduct = ""){
+async function renderProducts(searchProduct = ""){
     const productGrid = document.getElementById("productGrid");
     productGrid.innerHTML = "";
+    // fetch = pengambilan data melalui url
+    const response = await fetch("/order/getProducts");
+    products = await response.json();
 
     //filter
     const filtered = products.filter((product) =>{
@@ -123,7 +127,7 @@ function renderProducts(searchProduct = ""){
     filtered.forEach((product)=> {
         const col = document.createElement('div');
         col.className = "col-md-3 col-sm-6 mb-4";
-        col.innerHTML = 
+        col.innerHTML =
         `<div class="card product-card">
         <div class="product-img">
             <img src="../${product.product_photo}" alt="" width="100%">
@@ -141,7 +145,7 @@ function renderProducts(searchProduct = ""){
 }
 //useEffect(() =>{
 //}. [])
-// DomContentLoaded : akan meload funcion pertama kali 
+// DomContentLoaded : akan meload funcion pertama kali
 renderProducts();
 
 document.getElementById("searchProduct").addEventListener("input", function (e) {
