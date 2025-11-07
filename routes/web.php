@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('change-profile', [\App\Http\Controllers\ProfileController::class, 'changeProfile'])->name('profile.change-profile');
     Route::get('get-products', [\App\Http\Controllers\OrderController::class, 'getProducts'])->name('get-products');
 
+    Route::post('cashless', [\App\Http\Controllers\ProfileController::class, 'paymentCashless'])->name('cashless');
 
 
 });

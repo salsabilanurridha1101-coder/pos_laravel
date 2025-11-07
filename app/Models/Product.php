@@ -26,7 +26,7 @@ class Product extends Model
                 break;
 
             default:
-                return "badge text-bg-primary";
+                return "badge text-bg-warning";
                 break;
         }
     }

@@ -178,15 +178,16 @@ function updateTotal() {
     const tax = subTotal * 0.1;
     const total = tax + subTotal;
 
-    document.getElementById("Subtotal").textContent =
-        `Rp. ${subTotal.toLocaleString()}`;
+    document.getElementById(
+        "Subtotal"
+    ).textContent = `Rp. ${subTotal.toLocaleString()}`;
     document.getElementById("tax").textContent = `Rp. ${tax.toLocaleString()}`;
-    document.getElementById("total").textContent =
-        `Rp. ${total.toLocaleString()}`;
-     document.getElementById("subtotal_value").value = subtotal;
+    document.getElementById(
+        "total"
+    ).textContent = `Rp. ${total.toLocaleString()}`;
+    document.getElementById("subtotal_value").value = subTotal;
     document.getElementById("tax_value").value = tax;
     document.getElementById("total_value").value = total;
-
 
     // console.log(subTotal);
     // console.log(tax);
@@ -202,10 +203,14 @@ document.getElementById("clearCart").addEventListener("click", function () {
 // ngelampar ke php subtotalnya
 async function processPayment() {
     if (cart.length === 0) {
-        alert("The cart is still empty");
+        alert("cart Masih Kosong");
         return;
     }
-
+    const modal = new bootstrap.Modal(document.getElementById("exampleModal"));
+    modal.show();
+}
+async function handlePayment() {
+    const paymentMethod = document.getElementById("payment_method").value;
     const order_code = document
         .querySelector(".orderNumber")
         .textContent.trim();
@@ -213,28 +218,66 @@ async function processPayment() {
     const tax = document.querySelector("#tax_value").value.trim();
     const grandTotal = document.querySelector("#total_value").value.trim();
 
-    try {
-        const res = await fetch("/order/store", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-                cart,
-                order_code,
-                subtotal,
-                tax,
-                grandTotal,
-            }),
-        });
-        const data = await res.json();
-        if (data.status == "success") {
-            alert("Transaction success");
-            window.location.href = "print.php";
-        } else {
-            alert("transaction failed: " + data.message);
+    console.log(paymentMethod);
+    if (paymentMethod == "cash") {
+        try {
+            const res = await fetch("/order", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector(
+                        'meta[name="csrf-token"]'
+                    ).content,
+                },
+                body: JSON.stringify({
+                    cart,
+                    order_code,
+                    subtotal,
+                    tax,
+                    grandTotal,
+                }),
+            });
+            const data = await res.json();
+            if (data.status == "success") {
+                alert("Transaction success");
+                window.location.href = "order";
+            } else {
+                alert("transaction failed", data.message);
+            }
+            // const data = await res.json();
+        } catch (error) {
+            alert("transaction faailed");
+            console.error(error);
         }
-    } catch (error) {
-        alert("upss transaction fail");
-        console.log("error:" + error);
+    } else if (paymentMethod == "cashless") {
+        try {
+            const res = await fetch("/order/cashless", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector(
+                        'meta[name="csrf-token"]'
+                    ).content,
+                },
+                body: JSON.stringify({
+                    cart,
+                    order_code,
+                    subtotal,
+                    tax,
+                    grandTotal,
+                }),
+            });
+            const data = await res.json();
+            if (data.status == "success") {
+                window.snap.pay(data.snapToken);
+            } else {
+                alert("transaction failed", data.message);
+            }
+            // const data = await res.json();
+        } catch (error) {
+            alert("transaction faailed");
+            console.error(error);
+        }
     }
 }
 
