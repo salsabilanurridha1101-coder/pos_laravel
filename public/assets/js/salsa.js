@@ -95,60 +95,223 @@ function filterCategory(category, event) {
 
     let buttons = document.querySelectorAll(".category-btn");
     buttons.forEach((btn) => {
-    btn.classList.remove('active');
-    btn.classList.remove('btn-warning');
-    btn.classList.add("btn-outline-warning") ;
-});
-event.classList.add("active");
-event.classList.remove("btn-outline-warning");
-event.classList.add("btn-warning");
-console.log({currentCategory: currentCategory, category: category, event: event});
+        btn.classList.remove("active");
+        btn.classList.remove("btn-warning");
+        btn.classList.add("btn-outline-warning");
+    });
+    event.classList.add("active");
+    event.classList.remove("btn-outline-warning");
+    event.classList.add("btn-warning");
+    console.log({
+        currentCategory: currentCategory,
+        category: category,
+        event: event,
+    });
 
-
-renderProducts();
+    renderProducts();
 }
 
-async function renderProducts(searchProduct = ""){
+async function renderProducts(searchProduct = "") {
     const productGrid = document.getElementById("productGrid");
     productGrid.innerHTML = "";
-    // fetch = pengambilan data melalui url
-    const response = await fetch("/order/getProducts");
+    // console.log(products);
+
+    const response = await fetch("/get-products");
     products = await response.json();
 
-    //filter
-    const filtered = products.filter((product) =>{
-        //shorthand/ ternery
-        const matchCategory = currentCategory === "all" || product.category_name === currentCategory;
-        const matchSearch = product.product_name.toLowerCase().includes(searchProduct);
+    // filter
+    const filtered = products.filter((product) => {
+        // shorthand / ternery
+        const matchCategory =
+            currentCategory === "all" ||
+            product.category.category_name === currentCategory;
+        const matchSearch = product.product_name
+            .toLowerCase()
+            .includes(searchProduct);
         return matchCategory && matchSearch;
     });
 
-    //munculin data dari table products
-    filtered.forEach((product)=> {
-        const col = document.createElement('div');
-        col.className = "col-md-3 col-sm-6 mb-4";
-        col.innerHTML =
-        `<div class="card product-card">
-        <div class="product-img">
-            <img src="../${product.product_photo}" alt="" width="100%">
-        </div>
-        <div class="card-body">
-            <span class="badge bg-secondary badge-category">${product.category_name}</span>
-            <h6 class="card-title mt-2 mb-2">${product.product_name}</h6>
-            <p class="card-text text-primary fw-bold">Rp.${product.product_price}.-</p>
-        </div>
+    // munculin data dari table products
+    filtered.forEach((product) => {
+        console.log(product);
+
+        const col = document.createElement("div");
+        col.className = "col-md-4 col-sm-6";
+        col.innerHTML = `<div class="card product-card" onclick="addToCart(${product.id})">
+            <div class="product-img">
+                <img src="/storage/${product.product_photo}" width="100%">
+            </div>
+            <div class="card-body">
+                <span class="badge bg-secondary badge-category">${product.category.category_name}</span>
+                <h6 class="card-title mt-2 mb-2">${product.product_name}</h6>
+                <p class="card-text text-primary fw-bold">Rp. ${product.product_price}</p>
+            </div>
         </div>`;
         productGrid.appendChild(col);
     });
-
-    console.log(products);
 }
-//useEffect(() =>{
-//}. [])
-// DomContentLoaded : akan meload funcion pertama kali
+
+// hapus item cart
+function removeItem(id) {
+    cart = cart.filter((p) => p.id != id);
+    renderCart();
+}
+// mengatur qty item cart
+function changeQty(id, x) {
+    const item = cart.find((p) => p.id == id);
+    if (!item) {
+        return;
+    }
+    item.quantity += x;
+    if (item.quantity <= 0) {
+        alert("minimal harus 1 product");
+        // cart = filter((p) => p.id != id);
+    }
+    renderCart();
+}
+
+function updateTotal() {
+    const subTotal = cart.reduce(
+        (sum, item) => sum + item.product_price * item.quantity,
+        0
+    );
+    const tax = subTotal * 0.1;
+    const total = tax + subTotal;
+
+    document.getElementById("Subtotal").textContent =
+        `Rp. ${subTotal.toLocaleString()}`;
+    document.getElementById("tax").textContent = `Rp. ${tax.toLocaleString()}`;
+    document.getElementById("total").textContent =
+        `Rp. ${total.toLocaleString()}`;
+     document.getElementById("subtotal_value").value = subtotal;
+    document.getElementById("tax_value").value = tax;
+    document.getElementById("total_value").value = total;
+
+
+    // console.log(subTotal);
+    // console.log(tax);
+    // console.log(total);
+}
+
+// clearCart
+document.getElementById("clearCart").addEventListener("click", function () {
+    cart = [];
+    renderCart();
+});
+
+// ngelampar ke php subtotalnya
+async function processPayment() {
+    if (cart.length === 0) {
+        alert("The cart is still empty");
+        return;
+    }
+
+    const order_code = document
+        .querySelector(".orderNumber")
+        .textContent.trim();
+    const subtotal = document.querySelector("#subtotal_value").value.trim();
+    const tax = document.querySelector("#tax_value").value.trim();
+    const grandTotal = document.querySelector("#total_value").value.trim();
+
+    try {
+        const res = await fetch("/order/store", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+                cart,
+                order_code,
+                subtotal,
+                tax,
+                grandTotal,
+            }),
+        });
+        const data = await res.json();
+        if (data.status == "success") {
+            alert("Transaction success");
+            window.location.href = "print.php";
+        } else {
+            alert("transaction failed: " + data.message);
+        }
+    } catch (error) {
+        alert("upss transaction fail");
+        console.log("error:" + error);
+    }
+}
+
+let cart = [];
+function addToCart(id) {
+    const product = products.find((p) => p.id == id);
+
+    if (!product) {
+        return;
+    }
+    // mengecek apakah produknya sudah ada cart atau belum
+    const existing = cart.find((item) => item.id == id);
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        cart.push({ ...product, quantity: 1 });
+    }
+    renderCart();
+}
+
+function renderCart() {
+    const cartContainer = document.querySelector("#cartItems");
+    cartContainer.innerHTML = "";
+
+    if (cart.length === 0) {
+        cartContainer.innerHTML = `
+      <div class="cart-items" id="cartItems">
+      <div class="text-center text-muted mt-5">
+      <i class="bi bi-cart mb-3"></i>
+      <p>Cart Empty</p>
+      </div>
+      </div>`;
+        updateTotal();
+        // return;
+    }
+    cart.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className =
+            "cart-item d-flex justify-content-between align-items-center mb-2";
+        div.innerHTML = `
+        <div>
+
+                <img src='/storage/${item.product_photo}' alt="tes" width='80'>
+                <strong>${item.product_name}</strong>
+                <small>${item.product_price.toLocaleString("id-ID")}</small>
+                </div>
+                <div class="d-flex align-items-center m-5 gap-2">
+                    <button class="btn btn-outline-secondary me-2" onclick="changeQty(${
+                        item.id
+                    }, -1)">-</button>
+                    <span>${item.quantity}</span>
+                    <button class="btn btn-outline-secondary ms-3" onclick="changeQty(${
+                        item.id
+                    }, 1)">+</button>
+                    <button class="btn btn-sm btn-danger ms-3" onclick="removeItem(${
+                        item.id
+                    })">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>`;
+
+        cartContainer.appendChild(div);
+    });
+    updateTotal();
+}
+
+// useEffect(() => {
+// }, [])
+
+// DomContentLoaded : akan meliad function pertama kali
 renderProducts();
 
-document.getElementById("searchProduct").addEventListener("input", function (e) {
-    const searchProduct = e.target.value.toLowerCase();
-    renderProducts(searchProduct);
-});
+document
+    .getElementById("searchProduct")
+    .addEventListener("input", function (e) {
+        const searchProduct = e.target.value.toLowerCase();
+        renderProducts(searchProduct);
+        // console.log(searchProduct);
+        // alert("eyy");
+    });

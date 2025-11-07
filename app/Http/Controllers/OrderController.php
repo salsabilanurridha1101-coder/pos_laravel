@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+
 
 class OrderController extends Controller
 {
@@ -44,11 +48,14 @@ class OrderController extends Controller
     {
         try {
             $products = Product::with('category')->get();
-            return response()->json([
-                'message' => 'Fetch Product success',
-                'status' => true,
-                'data' => $products,
-            ]);
+            return response()->json($products);
+            //  try {
+            // $products = Product::with('category')->get();
+            // return response()->json([
+            //     'message' => 'Fetch Product success',
+            //     'status' => true,
+            // //     'data' => $products,
+            // ]);
             //code...
         } catch (\Throwable $th) {
             return response()->json([
@@ -65,7 +72,35 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            DB::beginTransaction();
+            $order = Order::create([
+                'order_code' => $request->order_code,
+                'order_amount' => $request->subtotal,
+                'order_status' => 1,
+                'order_subtotal' => $request->grandTotal
+            ]);
+
+            foreach($request->cart as $item){
+                OrderDetail::insert([
+                    'order_id' => $order->id,
+                    'product_id' => $item->id,
+                    'qty' => $item->quantity,
+                    'order_price' => $item->product_price,
+                ]);
+            }
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'order_code' => $request->order_code
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => $th->getMessage(),
+            ]);
+        }
     }
 
     /**

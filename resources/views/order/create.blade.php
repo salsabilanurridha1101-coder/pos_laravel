@@ -7,7 +7,7 @@
     <title>Point Of Sale</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
-    <link rel="stylesheet" href="{{asset('assets/css/salsa.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/salsa.css') }}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
 </head>
 
@@ -28,12 +28,15 @@
                     <h4 class="mb-3" id="product-title">
                         <i class="fas fas-store"></i>product
                     </h4>
-                    <input type="text" id="searchProduct" class="form-control search-box" placeholder="find the product..">
+                    <input type="text" id="searchProduct" class="form-control search-box"
+                        placeholder="find the product..">
                 </div>
                 <div class="mb-4">
-                    <button class="btn btn-warning category-btn active" onclick="filterCategory('all', this)">All Menu</button>
+                    <button class="btn btn-warning category-btn active" onclick="filterCategory('all', this)">All
+                        Menu</button>
                     @foreach ($categories as $cat)
-                        <button class="btn btn-outline-warning category-btn " onclick="filterCategory('{{ $cat->category_name}}', this)">{{ $cat->category_name }}</button>
+                        <button class="btn btn-outline-warning category-btn "
+                            onclick="filterCategory('{{ $cat->category_name }}', this)">{{ $cat->category_name }}</button>
                     @endforeach
                     <!-- <button class="btn btn-outline-warning category-btn ">Drink</button>
                     <button class="btn btn-outline-warning category-btn ">Snack</button> -->
@@ -71,7 +74,7 @@
 
                     <div class="row g-2">
                         <div class="col-md-6">
-                            <button class="btn btn-outline-danger w-100">
+                            <button class="btn btn-outline-danger w-100" id="clearCart">
                                 <i class="bi bi-trash"></i> Clear Cart
                             </button>
                         </div>
@@ -86,8 +89,7 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-            crossorigin="anonymous">
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
         </script>
 
 
